@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  	<title>Twitter Websocket API</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	
+	<link rel="stylesheet" href="http://localhost:8080/css/style.css">
+
+	<script type="text/javascript">
+		var username = location.pathname.split("/")[2];
+		var websocket = new WebSocket("ws://localhost:8080/websocket?"+username);
+		console.log(window.location);
+		function toggleReTweet(){
+			var tweet = document.getElementById("Tweet");
+			tweet.style.display = "none";
+		}
+		
+	</script>
+	</head>
+	<body>
+	<section class="ftco-section-profile">
+		<div class="container">
+
+            <div class="form-group d-md-flex" style="margin-bottom: 45px;">
+                <div class="w-50 text-md-left">
+                    <button class="form-control-profile btn btn-primary rounded submit px-3">Tweet</button>
+                </div>
+				<div class="w-50 text-center">
+                    <button class="form-control-profile btn btn-primary rounded submit px-3" onclick="toggleReTweet();">ReTweet</button>
+                </div>
+                <div class="w-50 text-center">
+                    <button class="form-control-profile btn btn-primary rounded submit px-3">Subscribe</button>
+                </div>
+                <div class="w-50 text-md-right">
+                    <button class="form-control-profile btn btn-primary rounded submit px-3">Search Tweets</button>
+                </div>
+            </div>
+
+			<div id="Tweet">
+				<div class="row justify-content-center">
+					<div class="col-md-6 text-center mb-5">
+						<h2 class="heading-section">Your Feed</h2>
+					</div>
+				</div>
+				<div class="row justify-content-center">
+					<div class="mb-5">
+						<div class="login-wrap p-4 p-md-5">
+							<h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted User 1 tweeted: User2 tweeted</h5>
+							<h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted</h5>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section">Welcome User</h2>
+				</div>
+			</div>
+
+            <div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section">Your Feed</h2>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="mb-5">
+					<div class="login-wrap p-4 p-md-5">
+		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted User 1 tweeted: User2 tweeted</h5>
+		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted</h5>
+	                </div>
+				</div>
+			</div>
+
+            <div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section">Your Tweets</h2>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="mb-5">
+					<div class="login-wrap p-4 p-md-5">
+		      	        <h5 class="text-truncate mb-4">User 1</h5>
+		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted</h5>
+	                </div>
+				</div>
+			</div>
+
+            <div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section">Your Mentions</h2>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="mb-5">
+					<div class="login-wrap p-4 p-md-5">
+		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted User 1 tweeted: User2 tweeted</h5>
+		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted</h5>
+	                </div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<script src="http://localhost:8080/js/jquery.min.js"></script>
+  <script src="http://localhost:8080/js/popper.js"></script>
+  <script src="http://localhost:8080/js/bootstrap.min.js"></script>
+  <script src="http://localhost:8080/js/main.js"></script>
+
+	</body>
+</html>
+

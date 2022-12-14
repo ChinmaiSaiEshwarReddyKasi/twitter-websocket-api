@@ -14,7 +14,7 @@
 -define(SERVER, ?MODULE).
 
 start_link() ->
-    supervisor:start_link({local, ?SERVER}, ?MODULE, []).
+    supervisor:start_link({global, ?SERVER}, ?MODULE, []).
 
 %% sup_flags() = #{strategy => strategy(),         % optional
 %%                 intensity => non_neg_integer(), % optional
@@ -29,7 +29,11 @@ init([]) ->
     SupFlags = #{strategy => one_for_all,
                  intensity => 0,
                  period => 1},
-    ChildSpecs = [],
+    TwitterServer = #{
+        id => twitterServer,
+        start => {twitterapi_server, start_link, []},
+        modules => [twitterapi_server]},
+    ChildSpecs = [TwitterServer],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions
