@@ -13,11 +13,170 @@
 
 	<script type="text/javascript">
 		var username = location.pathname.split("/")[2];
+
 		var websocket = new WebSocket("ws://localhost:8080/websocket?"+username);
-		console.log(window.location);
+		
+
+		websocket.onopen = function(e) {
+			console.log("[open] Connection established");
+		};
+
+		websocket.onmessage = function(event){
+			let data = JSON.parse(event.data);
+			if(data.Type == "Profile"){
+				let feedStr = "";
+				let tweetsStr = "";
+				let mentionsStr = "";
+				let subscribersStr = "";
+				let subscriptionsStr = "";
+				let feed = data.Feed;
+				let tweets = data.Tweets;
+				let mentions = data.Mentions;
+				let subscribers = data.Subscribers;
+				let subscriptions = data.Subscriptions;
+
+				if(feed.length == 0){
+					feedStr += "<h5 class='text-truncate mb-4'>" + "Your feed is empty" + "</h5>";
+				} else {
+					feed.forEach(function(element){
+						feedStr += "<h5 class='text-truncate mb-4'>" + element + "</h5>";
+					});
+				};
+
+				if(tweets.length == 0){
+					tweetsStr += "<h5 class='text-truncate mb-4'>" + "You don't have any tweets" + "</h5>";
+				} else {
+					tweets.forEach(function(element){
+						tweetsStr += "<h5 class='text-truncate mb-4'>" + element + "</h5>";
+					});
+				};
+
+				if(mentions.length == 0){
+					mentionsStr += "<h5 class='text-truncate mb-4'>" + "You don't have any mentions" + "</h5>";
+				} else {
+					mentions.forEach(function(element){
+						mentionsStr += "<h5 class='text-truncate mb-4'>" + element + "</h5>";
+					});
+				};
+
+				if(subscribers.length == 0){
+					subscribersStr += "<h5 class='text-truncate mb-4'>" + "You don't have any subscribers" + "</h5>";
+				} else {
+					subscribers.forEach(function(element){
+						subscribersStr += "<h5 class='text-truncate mb-4'>" + element + "</h5>";
+					});
+				};
+
+				if(subscriptions.length == 0){
+					subscriptionsStr += "<h5 class='text-truncate mb-4'>" + "You don't have any subscriptions" + "</h5>";
+				} else {
+					subscriptions.forEach(function(element){
+						subscriptionsStr += "<h5 class='text-truncate mb-4'>" + element + "</h5>";
+					});
+				};
+
+				document.getElementById("FeedData").innerHTML = feedStr;
+				document.getElementById("TweetsData").innerHTML = tweetsStr;
+				document.getElementById("MentionsData").innerHTML = mentionsStr;
+				document.getElementById("SubscribersData").innerHTML = subscribersStr;
+				document.getElementById("SubscriptionsData").innerHTML = subscriptionsStr;
+
+			} else if(data.Type == "Search") {
+				let searchStr = "";
+				let searchData = data.HashtagData;
+
+				if(searchData.length == 0){
+					searchStr += "<h5 class='text-truncate mb-4'>" + "There no Tweets for the provided Hastag" + "</h5>";
+				} else {
+					searchData.forEach(function(element){
+						searchStr += "<h5 class='text-truncate mb-4'>" + element + "</h5>";
+					});
+				};
+
+				document.getElementById("SearchOutput").innerHTML = searchStr;
+				searchOutput.style.display ="";
+			}
+		};
+
+		websocket.onclose = function(event){
+			if (event.wasClean) {
+				console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+			} else {
+        		console.log('[close] Connection died');
+			}
+		};
+
+		websocket.onerror = function(error) {
+			console.log(`[error] ${error.message}`);
+		};
+		
+		function toggleTweet(){
+			retweet.style.display = "none";
+			subscribe.style.display = "none";
+			search.style.display = "none";
+
+			if(newtweet.style.display == "none"){
+				newtweet.style.display = "";
+				tweetInput.value = "";
+			} else {
+				newtweet.style.display = "none";
+			};
+		};
+
 		function toggleReTweet(){
-			var tweet = document.getElementById("Tweet");
-			tweet.style.display = "none";
+			newtweet.style.display = "none";
+			subscribe.style.display = "none";
+			search.style.display = "none";
+
+			if(retweet.style.display == "none"){
+				retweet.style.display = "";
+				retweetInput.value = "";
+			} else {
+				retweet.style.display = "none";
+			};
+		};
+
+		function toggleSubscribe(){
+			newtweet.style.display = "none";
+			retweet.style.display = "none";
+			search.style.display = "none";
+			
+			if(subscribe.style.display == "none"){
+				subscribe.style.display = "";
+				subscribeInput.value = "";
+			} else {
+				subscribe.style.display = "none";
+			};
+		};
+
+		function toggleSearch(){
+			newtweet.style.display = "none";
+			retweet.style.display = "none";
+			subscribe.style.display = "none";
+			searchOutput.style.display ="none";
+
+			if(search.style.display == "none"){
+				search.style.display = "";
+				searchInput.value = "";
+			} else {
+				search.style.display = "none";
+			};
+		};
+
+		function logout(){
+			websocket.close();
+			const url = "http://localhost:8080/logout?"+username;
+			const Data = {Username: username};
+			const Params = {
+				headers: {
+					"content-type": "application/json; charset=UTF-8"
+				},
+				body: Data,
+				method: "POST"
+			};
+			fetch(url, Params)
+			.then(data=>{console.log("logged out");window.location = "http://localhost:8080/";})
+			.catch(error=>console.log(error));
 		}
 		
 	</script>
@@ -26,40 +185,126 @@
 	<section class="ftco-section-profile">
 		<div class="container">
 
+<!--
+	################################ Buttons ################################ 
+--> 
             <div class="form-group d-md-flex" style="margin-bottom: 45px;">
-                <div class="w-50 text-md-left">
-                    <button class="form-control-profile btn btn-primary rounded submit px-3">Tweet</button>
+                <div class="w-50 text-center">
+                    <button class="form-control-profile btn btn-primary rounded submit px-3" onclick="toggleTweet();">Tweet</button>
                 </div>
 				<div class="w-50 text-center">
                     <button class="form-control-profile btn btn-primary rounded submit px-3" onclick="toggleReTweet();">ReTweet</button>
                 </div>
                 <div class="w-50 text-center">
-                    <button class="form-control-profile btn btn-primary rounded submit px-3">Subscribe</button>
+                    <button class="form-control-profile btn btn-primary rounded submit px-3" onclick="toggleSubscribe();">Subscribe</button>
                 </div>
-                <div class="w-50 text-md-right">
-                    <button class="form-control-profile btn btn-primary rounded submit px-3">Search Tweets</button>
+                <div class="w-50 text-center">
+                    <button class="form-control-profile btn btn-primary rounded submit px-3" onclick="toggleSearch();">Search Tweets</button>
+                </div>
+				<div class="w-50 text-center">
+                    <button class="form-control-profile btn btn-primary rounded submit px-3" onclick="logout();">Logout</button>
                 </div>
             </div>
 
-			<div id="Tweet">
+<!--
+	################################ Buttons Fields ################################ 
+--> 
+			<div id="TweetButtonContent">
 				<div class="row justify-content-center">
 					<div class="col-md-6 text-center mb-5">
-						<h2 class="heading-section">Your Feed</h2>
+						<h2 class="heading-section">Create a new Tweet</h2>
 					</div>
 				</div>
 				<div class="row justify-content-center">
 					<div class="mb-5">
 						<div class="login-wrap p-4 p-md-5">
-							<h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted User 1 tweeted: User2 tweeted</h5>
-							<h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted</h5>
+							<form id="tweetForm" action="#" method="POST" class="login-form">
+								<div class="form-group">
+									<input id="tweetff" name="tweet" type="text" class="form-control rounded-left" placeholder="Tweet" required>
+								</div>
+								<div class="form-group">
+									<button type="submit" class="form-control btn btn-primary rounded submit px-3" onclick="toggleTweet();">Create Tweet</button>
+								</div>
+							</form>
 						</div>
 					</div>
 				</div>
 			</div>
 
+			<div id="ReTweetButtonContent">
+				<div class="row justify-content-center">
+					<div class="col-md-6 text-center mb-5">
+						<h2 class="heading-section">ReTweet</h2>
+					</div>
+				</div>
+				<div class="row justify-content-center">
+					<div class="mb-5">
+						<div class="login-wrap p-4 p-md-5">
+							<form id="reTweetForm" action="#" method="POST" class="login-form">
+								<div class="form-group">
+									<input id="retweetff" name="retweet" type="text" class="form-control rounded-left" placeholder="Tweet" required>
+								</div>
+								<div class="form-group">
+									<button type="submit" class="form-control btn btn-primary rounded submit px-3" onclick="toggleReTweet();">ReTweet</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="SubscribeButtonContent">
+				<div class="row justify-content-center">
+					<div class="col-md-6 text-center mb-5">
+						<h2 class="heading-section">Subscribe</h2>
+					</div>
+				</div>
+				<div class="row justify-content-center">
+					<div class="mb-5">
+						<div class="login-wrap p-4 p-md-5">
+							<form id="subscribeForm" action="#" method="POST" class="login-form">
+								<div class="form-group">
+									<input  type="text" id="subscriberIdff" name="subscriberId" class="form-control rounded-left" placeholder="Subscriber Id" required>
+								</div>
+								<div class="form-group">
+									<button type="submit" class="form-control btn btn-primary rounded submit px-3" onclick="toggleSubscribe();">Subscribe</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="SearchButtonContent">
+				<div class="row justify-content-center">
+					<div class="col-md-6 text-center mb-5">
+						<h2 class="heading-section">Search Tweets</h2>
+					</div>
+				</div>
+				<div class="row justify-content-center">
+					<div class="mb-5">
+						<div class="login-wrap p-4 p-md-5">
+							<form id="searchForm" action="#" method="POST" class="login-form">
+								<div class="form-group">
+									<input id="searchff" name="search" type="text" class="form-control rounded-left" placeholder="Search Hashtag" required>
+								</div>
+								<div class="form-group">
+									<button type="submit" class="form-control btn btn-primary rounded submit px-3">Search</button>
+								</div>
+							</form>
+							<div id="SearchOutput">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+<!--
+	################################ Main Content ################################ 
+--> 
 			<div class="row justify-content-center">
 				<div class="col-md-6 text-center mb-5">
-					<h2 class="heading-section">Welcome User</h2>
+					<h2 id="heading" class="heading-section"></h2>
 				</div>
 			</div>
 
@@ -70,9 +315,7 @@
 			</div>
 			<div class="row justify-content-center">
 				<div class="mb-5">
-					<div class="login-wrap p-4 p-md-5">
-		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted User 1 tweeted: User2 tweeted</h5>
-		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted</h5>
+					<div id="FeedData" class="login-wrap p-4 p-md-5">
 	                </div>
 				</div>
 			</div>
@@ -84,9 +327,7 @@
 			</div>
 			<div class="row justify-content-center">
 				<div class="mb-5">
-					<div class="login-wrap p-4 p-md-5">
-		      	        <h5 class="text-truncate mb-4">User 1</h5>
-		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted</h5>
+					<div id="TweetsData" class="login-wrap p-4 p-md-5">
 	                </div>
 				</div>
 			</div>
@@ -98,9 +339,31 @@
 			</div>
 			<div class="row justify-content-center">
 				<div class="mb-5">
-					<div class="login-wrap p-4 p-md-5">
-		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted User 1 tweeted: User2 tweeted</h5>
-		      	        <h5 class="text-truncate mb-4">User 1 tweeted: User2 tweeted</h5>
+					<div id="MentionsData" class="login-wrap p-4 p-md-5">
+	                </div>
+				</div>
+			</div>
+
+			<div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section">Your Subscribers</h2>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="mb-5">
+					<div id="SubscribersData" class="login-wrap p-4 p-md-5">
+	                </div>
+				</div>
+			</div>
+
+			<div class="row justify-content-center">
+				<div class="col-md-6 text-center mb-5">
+					<h2 class="heading-section">Your Subscriptions</h2>
+				</div>
+			</div>
+			<div class="row justify-content-center">
+				<div class="mb-5">
+					<div id="SubscriptionsData" class="login-wrap p-4 p-md-5">
 	                </div>
 				</div>
 			</div>
@@ -111,6 +374,30 @@
   <script src="http://localhost:8080/js/popper.js"></script>
   <script src="http://localhost:8080/js/bootstrap.min.js"></script>
   <script src="http://localhost:8080/js/main.js"></script>
+  <script type="text/javascript">
+	document.getElementById("heading").innerHTML = "Welcome " + username;
+	document.getElementById("tweetForm").action = "http://localhost:8080/tweet?" + username;
+	document.getElementById("reTweetForm").action = "http://localhost:8080/retweet?" + username;
+	document.getElementById("subscribeForm").action = "http://localhost:8080/subscribe?" + username;
+	document.getElementById("searchForm").action = "http://localhost:8080/searchTweets?" + username;
+
+	var newtweet = document.getElementById("TweetButtonContent");
+	var retweet = document.getElementById("ReTweetButtonContent");
+	var subscribe = document.getElementById("SubscribeButtonContent");
+	var search = document.getElementById("SearchButtonContent");
+	var searchOutput = document.getElementById("SearchOutput");
+	var tweetInput = document.getElementById("tweetff");
+	var retweetInput = document.getElementById("retweetff");
+	var subscribeInput = document.getElementById("subscriberIdff");
+	var searchInput = document.getElementById("searchff");
+	
+	newtweet.style.display = "none";
+	retweet.style.display = "none";
+	subscribe.style.display = "none";
+	search.style.display = "none";
+	searchOutput.style.display ="none";
+
+  </script>
 
 	</body>
 </html>

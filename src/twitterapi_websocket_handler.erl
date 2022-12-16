@@ -9,27 +9,17 @@
 
 
 init(Req, Opts) ->
-    % io:format("~p ws start~n",[self()]),
-    % io:format("~p ws start pid~n",[binary_to_atom(maps:get(qs, Req))]),
-    % io:format("~p ws start pid~n",[maps:get(pid, Req)]),
     Username = binary_to_atom(maps:get(qs, Req)),
     Pid = maps:get(pid, Req),
     twitterapi_server:update_pid(atom_to_list(Username), Pid),
-    % twitterServer ! {updatePid, atom_to_list(Username), Pid},
-    % register(Username, Pid),
 	{cowboy_websocket, Req, Opts, #{idle_timeout => ?HOUR}}.
 
 websocket_init(State) ->
-    % io:format("~p ws init~n",[self()]),
-    % eshwar ! {wsMsg, #{<<"hey">>=>[<<"hello">>, <<"hi">>]}},
-	% erlang:start_timer(4000, self(), <<"Hello!">>),
 	{[], State}.
 
 websocket_handle({text, Msg}, State) ->
-    io:format("~p handle1~n",[self()]),
-	{[{text, << "That's what she said! ", Msg/binary >>}], State};
+	{[{text, << Msg/binary >>}], State};
 websocket_handle(_Data, State) ->
-    io:format("handle2~n"),
 	{[], State}.
 
 websocket_info({wsMsg, Msg}, State) ->
